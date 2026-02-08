@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Be My Valentine?</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+    body {
+        background-color: #fff5f5;
+        overflow: hidden;
+    }
+
+    #no-btn {
+        position: fixed;
+        transition: all 0.25s ease;
+        z-index: 50;
+    }
+</style>
+</head>
+
+<body class="flex items-center justify-center min-h-screen font-sans">
+
+<div id="card" class="text-center p-8 bg-white rounded-3xl shadow-xl max-w-sm w-full relative z-10">
+
+    <div id="media-box" class="mb-6 h-48 flex justify-center items-center">
+        <img id="gif"
+             src="https://media.giphy.com/media/qUIm5wu6LAAog/giphy.gif"
+             class="rounded-lg h-full object-cover">
+    </div>
+
+    <h1 id="question" class="text-2xl font-bold mb-8">
+        Will you be my Valentine? 🌹
+    </h1>
+
+    <!-- Button row -->
+    <div id="button-row" class="flex justify-center gap-10 relative">
+        <button id="yes-btn"
+            class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-8 rounded-full shadow-lg">
+            YES 💖
+        </button>
+
+        <!-- Invisible placeholder to preserve spacing -->
+        <div id="no-placeholder" class="w-[96px] h-[44px]"></div>
+    </div>
+</div>
+
+<!-- Actual NO button -->
+<button id="no-btn"
+    class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-8 rounded-full shadow-lg">
+    NO 🙃
+</button>
+
+<audio id="escape-sound" src="https://www.myinstants.com/media/sounds/pop.mp3"></audio>
+
+<script>
+const noBtn = document.getElementById("no-btn");
+const yesBtn = document.getElementById("yes-btn");
+const placeholder = document.getElementById("no-placeholder");
+const card = document.getElementById("card");
+const gif = document.getElementById("gif");
+const question = document.getElementById("question");
+const sound = document.getElementById("escape-sound");
+
+let escaped = false;
+let speed = 0.25;
+
+// Place NO exactly over placeholder on load
+function placeNoInitially() {
+    const rect = placeholder.getBoundingClientRect();
+    noBtn.style.left = `${rect.left}px`;
+    noBtn.style.top = `${rect.top}px`;
+}
+window.onload = placeNoInitially;
+
+function moveNo() {
+    escaped = true;
+
+    const btnRect = noBtn.getBoundingClientRect();
+    const cardRect = card.getBoundingClientRect();
+    let x, y;
+
+    do {
+        x = Math.random() * (window.innerWidth - btnRect.width);
+        y = Math.random() * (window.innerHeight - btnRect.height);
+    } while (
+        x > cardRect.left - btnRect.width &&
+        x < cardRect.right &&
+        y > cardRect.top - btnRect.height &&
+        y < cardRect.bottom
+    );
+
+    speed = Math.max(0.08, speed - 0.02);
+    noBtn.style.transition = `all ${speed}s ease`;
+
+    noBtn.style.left = `${x}px`;
+    noBtn.style.top = `${y}px`;
+
+    sound.currentTime = 0;
+    sound.play();
+}
+
+// Escape triggers
+noBtn.addEventListener("mouseenter", moveNo);
+noBtn.addEventListener("click", moveNo);
+noBtn.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    moveNo();
+});
+
+document.addEventListener("mousemove", (e) => {
+    if (!escaped) return;
+
+    const rect = noBtn.getBoundingClientRect();
+    const dist = Math.hypot(
+        e.clientX - (rect.left + rect.width / 2),
+        e.clientY - (rect.top + rect.height / 2)
+    );
+
+    if (dist < 90) moveNo();
+});
+
+// YES click → show image
+yesBtn.addEventListener("click", () => {
+    question.innerHTML = "Yayyy! ❤️<br><span class='text-pink-500'>You made my day 🥹</span>";
+
+    gif.src = "D:\Photos\qwertyuio\M\Snapchat-1161758225.jpg"; 
+    // 👆 replace with YOUR image URL
+
+    noBtn.style.display = "none";
+
+    confetti({
+        particleCount: 200,
+        spread: 90,
+        origin: { y: 0.6 },
+        colors: ["#ff69b4", "#ff1493", "#ffffff"]
+    });
+});
+</script>
+
+</body>
+</html>
